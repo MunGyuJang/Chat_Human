@@ -70,7 +70,7 @@
 - 베이스 모델로 ['skt/kogpt2-base-v2'](https://github.com/SKT-AI/KoGPT2) 을 사용함.   
  
  
-<p align ="center"><img src="/images/gpt2.png" width="800px" height="300px"></p>
+<p align ="center"><img src="https://user-images.githubusercontent.com/112140135/216884750-53fb4373-2d9d-4a6a-800b-0062b8b702f5.png" width="800px" height="300px"></p>
 
 ---
 ### 학습 진행과정 리더보드
