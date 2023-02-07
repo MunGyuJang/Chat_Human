@@ -198,10 +198,10 @@ for i in tqdm(range(len(self.data))):
 break을 남겨놓을 경우 데이터 하나당 최대 한 개의 데이터를 생성하지만
 break을 제거할 경우 가능한 모든 턴수를 모두 데이터로 사용해 agumentation함
   ex: max_turns = 6
-  `<usr>가나다<sys>라마바<usr>사아자<sys>차카타<usr>파하가<sys>나다라<usr>마바사<sys>아자차` =
-   `<usr>가나다<sys>라마바<usr>사아자<sys>차카타<usr>파하가<sys>나다라`, -- 6턴
-    `<usr>가나다<sys>라마바<usr>사아자<sys>차카타`, -- 4턴
-     `<usr>가나다<sys>라마바`... -- 2
+  `<usr>가나다<sys>라마바<usr>사아자<sys>차카타<usr>파하가<sys>나다라<usr>마바사<sys>아자차` =  
+   `<usr>가나다<sys>라마바<usr>사아자<sys>차카타<usr>파하가<sys>나다라`, -- 6턴  
+    `<usr>가나다<sys>라마바<usr>사아자<sys>차카타`, -- 4턴  
+     `<usr>가나다<sys>라마바`... -- 2  
 
 하지만 작업 속도만 늘어날 뿐 큰 성과는 없었음.
 
@@ -345,7 +345,7 @@ class ChatBot:
   -- talk 메서드 생략
 ```
 model.fit 외에도 원하는 기능들을 사용하기 위해 허깅페이스의 모델 학습 코드를 공부하기보다 직접 class를 만들어 사용함.
-필요했던 기능으로는 간단한 학습 수행, 체크포인트 저장 메서드, 체크포인트 불러오기 메서드, loss 리스트
+필요했던 기능으로는 간단한 학습 수행 , 체크포인트 저장 메서드, 체크포인트 불러오기 메서드, loss 리스트
       
 - SentencePiece
 ```python
@@ -395,10 +395,17 @@ sentences, tokenizer = get_tokenizer(conversations, '249388')
 
 # src_corpus = [tokenizer.EncodeAsIds(sentence) for sentence in corpus['document']]
 ```
+
 허깅페이스의 토크나이저는 vocabulary가 정해져 있어서 커스텀 데이터에 맞는 커스텀 토크나이저가 있다면 어떨까 시도해봄.
-결과는 `RuntimeError: CUDA error: device-side assert triggered
+
+결과는 
+
+```RuntimeError: CUDA error: device-side assert triggered
 CUDA kernel errors might be asynchronously reported at some other API call,so the stacktrace below might be incorrect.
-For debugging consider passing CUDA_LAUNCH_BLOCKING=1.` 오류를 마지막으로 실험 종료.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1.```
+
+오류를 마지막으로 실험 종료.
+
 ---
 ### 참고 문헌
 1. [songys/AwesomeKorean_Data: 한국어 데이터 세트 링크](https://github.com/songys/AwesomeKorean_Data)
