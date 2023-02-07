@@ -154,8 +154,8 @@ label =====>  tensor([[-100, -100, -100,  ..., -100, -100, -100],
 ```
 첫 설계는 길이/턴 수가 긴 데이터는 뒷부분을 자르고 앞부분을 남기는 방식으로 시도함
 
-<usr>가나다<sys>라마바<usr>사아자(길이/턴수초과)<sys>차카타 :
- <usr>가나다<sys>라마바 -- 자를 때는 무조건 sys 대화로 종료
+`<usr>가나다<sys>라마바<usr>사아자(길이/턴수초과)<sys>차카타` :
+ `<usr>가나다<sys>라마바` -- 자를 때는 무조건 sys 대화로 종료
 
 ```python
 for i in tqdm(range(len(self.data))):
@@ -198,14 +198,14 @@ for i in tqdm(range(len(self.data))):
 break을 남겨놓을 경우 데이터 하나당 최대 한 개의 데이터를 생성하지만
 break을 제거할 경우 가능한 모든 턴수를 모두 데이터로 사용해 agumentation함
   ex: max_turns = 6
-  <usr>가나다<sys>라마바<usr>사아자<sys>차카타<usr>파하가<sys>나다라<usr>마바사<sys>아자차 =
-   <usr>가나다<sys>라마바<usr>사아자<sys>차카타<usr>파하가<sys>나다라,
-    <usr>가나다<sys>라마바<usr>사아자<sys>차카타,
-     <usr>가나다<sys>라마바...
+  `<usr>가나다<sys>라마바<usr>사아자<sys>차카타<usr>파하가<sys>나다라<usr>마바사<sys>아자차` =
+   `<usr>가나다<sys>라마바<usr>사아자<sys>차카타<usr>파하가<sys>나다라`, -- 6턴
+    `<usr>가나다<sys>라마바<usr>사아자<sys>차카타`, -- 4턴
+     `<usr>가나다<sys>라마바`... -- 2
 
 하지만 작업 속도만 늘어날 뿐 큰 성과는 없었음.
 
-오히려 agumentation을 포기하면서 __init__이 아닌 get_item에서 작업을 수행할 경우 연산 속도가 더 빠름
+오히려 agumentation을 포기하면서 `__init__`이 아닌 `get_item`에서 작업을 수행할 경우 연산 속도가 더 빠름
 
 - class ChatBot
 ```python
