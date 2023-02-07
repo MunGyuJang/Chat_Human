@@ -401,7 +401,7 @@ sentences, tokenizer = get_tokenizer(conversations, '249388')
 
 허깅페이스의 토크나이저는 vocabulary가 정해져 있어서 커스텀 데이터에 맞는 커스텀 토크나이저가 있다면 어떨까 시도해봄.
 
-결과는 
+결과는 학습을 마친 후 문장 생성을 시도할 경우
 
 ```RuntimeError: CUDA error: device-side assert triggered
 CUDA kernel errors might be asynchronously reported at some other API call,so the stacktrace below might be incorrect.
