@@ -197,7 +197,7 @@ for i in tqdm(range(len(self.data))):
 ```
 break을 남겨놓을 경우 데이터 하나당 최대 한 개의 데이터를 생성하지만
 break을 제거할 경우 가능한 모든 턴수를 모두 데이터로 사용해 agumentation함
-  ex: max_turns = 6
+  ex: max_turns = 6  
   `<usr>가나다<sys>라마바<usr>사아자<sys>차카타<usr>파하가<sys>나다라<usr>마바사<sys>아자차` =  
    `<usr>가나다<sys>라마바<usr>사아자<sys>차카타<usr>파하가<sys>나다라`, -- 6턴  
     `<usr>가나다<sys>라마바<usr>사아자<sys>차카타`, -- 4턴  
@@ -402,7 +402,8 @@ sentences, tokenizer = get_tokenizer(conversations, '249388')
 
 ```RuntimeError: CUDA error: device-side assert triggered
 CUDA kernel errors might be asynchronously reported at some other API call,so the stacktrace below might be incorrect.
-For debugging consider passing CUDA_LAUNCH_BLOCKING=1.```
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1.
+```
 
 오류를 마지막으로 실험 종료.
 
