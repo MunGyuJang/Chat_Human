@@ -116,6 +116,7 @@ __Shift = Input은 `<s>` 토큰을 bos_token으로 사용, Label은 `</s>`토큰
 
 ### 회고
 ```python
+- 커스텀 데이터 로더 
 token_ids ====>  tensor([[49186,     2,     4,  ...,     0,     0,     0],
         [49186,     2,     4,  ...,     0,     0,     0],
         [49186,     2,     4,  ...,     0,     0,     0],
@@ -151,7 +152,253 @@ label =====>  tensor([[-100, -100, -100,  ..., -100, -100, -100],
         [-100, -100, -100,  ..., -100, -100, -100],
         [-100, -100, -100,  ..., -100, -100, -100]]))
 ```
+첫 설계는 길이/턴 수가 긴 데이터는 뒷부분을 자르고 앞부분을 남기는 방식으로 시도함
 
+<usr>가나다<sys>라마바<usr>사아자(길이/턴수초과)<sys>차카타 :
+ <usr>가나다<sys>라마바 -- 자를 때는 무조건 sys 대화로 종료
+
+```python
+for i in tqdm(range(len(self.data))):
+            hists = []
+            dials = self.data[i]
+            
+            for u, utter in enumerate(dials):
+                if u % 2 == 0:
+                    hists.append(self.usr_token + utter)  # Speaker 1: User
+                else:
+                    hists.append(self.sys_token + utter)  # Speaker 2: System
+            
+            max_turn = max(len(hists), self.max_turns) # max_turns을 넘으면 post
+            if max_turn % 2 != 0: max_turn -= 1 # user 대화로 끝남 방지
+                
+            for f in range(max_turn, 1, -2):
+                contexts = hists[:f]
+                if sum([len(l) for l in contexts]) > self.max_len-2: continue # bos_token와 eos_token 토큰을 추가하기 위해 -2
+                contexts[0] = self.bos_token + contexts[0]
+                contexts[-1] = contexts[-1] + self.eos_token
+                contexts = [tokenizer.encode(ctx) for ctx in contexts]
+                
+                token_type_id = [[ctx[0]] * len(ctx) if c != 0 else [ctx[1]] * len(ctx) for c, ctx in enumerate(contexts)]
+                label = [[-100] * len(ctx) if c != len(contexts)-1 else [-100] + ctx[1:] for c, ctx in enumerate(contexts)]
+                
+                input_id = list(chain.from_iterable(contexts))
+                token_type_id = list(chain.from_iterable(token_type_id))
+                label = list(chain.from_iterable(label))
+                
+                assert len(input_id) == len(token_type_id) == len(label), "There is something wrong in dialogue process."
+                
+                input_id, token_type_id, label = self.make_padding(input_id, token_type_id, label)
+                
+                self.input_ids.append(input_id)
+                self.token_type_ids.append(token_type_id)
+                self.labels.append(label)
+                
+                break
+```
+break을 남겨놓을 경우 데이터 하나당 최대 한 개의 데이터를 생성하지만
+break을 제거할 경우 가능한 모든 턴수를 모두 데이터로 사용해 agumentation함
+  ex: max_turns = 6
+  <usr>가나다<sys>라마바<usr>사아자<sys>차카타<usr>파하가<sys>나다라<usr>마바사<sys>아자차 =
+   <usr>가나다<sys>라마바<usr>사아자<sys>차카타<usr>파하가<sys>나다라,
+    <usr>가나다<sys>라마바<usr>사아자<sys>차카타,
+     <usr>가나다<sys>라마바...
+
+하지만 작업 속도만 늘어날 뿐 큰 성과는 없었음.
+
+오히려 agumentation을 포기하면서 __init__이 아닌 get_item에서 작업을 수행할 경우 연산 속도가 더 빠름
+
+- class ChatBot
+```python
+class ChatBot:
+    """
+        __init__ : 챗봇 모델 생성
+            Args : model, tokenizer, Config
+        
+        train : 모델 학습 진행
+            Args : epochs, train_data, (validation_data), (save)
+        
+        load_model : 모델 불러오기
+            Args : PATH
+        
+        save_model : 모델 저장하기
+            Args : PATH
+        
+        talk : 챗봇 대화하기
+            대화 종료 멘트 : quit
+    """
+    
+    def __init__(self, model, tokenizer, Config):
+        """
+            Args : model, tokenizer, Config
+        """
+        self.model = model
+        self.tokenizer = tokenizer
+        self.device = Config.device
+        self.name = Config.model_name
+        self.optim = torch.optim.Adam(model.parameters(), lr=Config.learning_rate)
+        
+#         self.user_token_id = tokenizer.get_vocab()[Config.usr_token]
+#         self.bot_token_id = tokenizer.get_vocab()[Config.sys_token]
+        self.user_token_id = tokenizer.PieceToId(Config.usr_token)
+        self.bot_token_id = tokenizer.PieceToId(Config.sys_token)
+        self.max_len = Config.max_len
+        self.max_turns = Config.max_turns
+        
+        self.losses = []
+        self.val_losses = []
+    
+    def train(self, epochs, train_data, validation_data=None, save=None):
+        """
+            epochs, train_data, validation_data=None, save=None
+            save : epoch마다 모델을 저장할 경로/파일명
+        """
+        self.model.to(self.device)
+        for epoch in range(epochs):
+            self.model.train()
+            print(f"\n Epoch {epoch+1}/{epochs}", sep="\n")
+            starttime = time.time()
+            batch_loss = []
+
+            for i, batch in enumerate(train_data):
+                input_ids, token_type_ids, labels = batch
+                input_ids, token_type_ids, labels = \
+                    input_ids.to(self.device), token_type_ids.to(self.device), labels.to(self.device)
+                
+                outputs = self.model(
+                    input_ids=input_ids,
+                    token_type_ids = token_type_ids,
+                    labels = labels
+                )
+                
+                loss, logits = outputs[0], outputs[1]
+                
+                self.optim.zero_grad()
+                loss.backward()
+                self.optim.step()
+
+                batch_loss.append(loss.item())
+                
+                print(self.status(i+1, len(train_data), time.time()-starttime, np.mean(batch_loss)), end='\r')
+
+            self.losses.append(np.mean(batch_loss))
+            
+            if validation_data:
+                val_loss = self.validation(validation_data)
+                print(self.status(i+1, len(train_data), time.time()-starttime, np.mean(batch_loss)) + \
+                      " | val_loss : %.6f"%(val_loss), end='\r')
+                self.val_losses.append(val_loss)
+            
+            if save:
+                PATH = f'{save}_epochs-{epoch+1}_loss-{np.mean(batch_loss)}.pth'
+                torch.save(self.model.state_dict(), PATH)
+                
+    def validation(self, validation_data):
+        self.model.eval()
+        batch_loss = []
+        
+        with torch.no_grad():
+            for i, batch in enumerate(validation_data):
+                input_ids, token_type_ids, labels = batch
+                input_ids, token_type_ids, labels = \
+                    input_ids.to(self.device), token_type_ids.to(self.device), labels.to(self.device)
+                
+                outputs = self.model(
+                    input_ids=input_ids,
+                    token_type_ids = token_type_ids,
+                    labels = labels
+                )
+                
+                loss, logits = outputs[0], outputs[1]
+                batch_loss.append(loss.item())
+            
+            valid_loss = np.mean(batch_loss)
+        
+        return valid_loss
+
+    @staticmethod
+    def status(step, step_len, time, loss):
+        return "step : %d/%d - %ds | loss : %.6f | %.2fit/s"%(
+            step,
+            step_len,
+            int(time),
+            loss,
+            step/time
+        )
+    
+    def load_model(self, PATH):
+        """
+            PATH : pth 파일이 저장된 경로
+        """
+        self.model.load_state_dict(torch.load(PATH))
+        print("model loaded.")
+    
+    def save_model(self, PATH=None):
+        """
+            PATH : 저장할 파일 경로/이름, 생략시 모델 이름과 현재 시간을 파일명으로 지정함
+        """
+        if not PATH:
+            name = self.name.replace("/", "-")
+            PATH = f"./{name}_{time.strftime('%Y-%m-%d %H:%M:%S')}.pth"
+        torch.save(self.model.state_dict(), PATH)
+        print("model saved.")
+      
+  -- talk 메서드 생략
+```
+model.fit 외에도 원하는 기능들을 사용하기 위해 허깅페이스의 모델 학습 코드를 공부하기보다 직접 class를 만들어 사용함.
+필요했던 기능으로는 간단한 학습 수행, 체크포인트 저장 메서드, 체크포인트 불러오기 메서드, loss 리스트
+      
+- SentencePiece
+```python
+import pandas as pd
+import sentencepiece as spm
+from tqdm import tqdm
+
+data = pd.read_csv('spacing_data.csv', encoding='utf-8')
+conversations = data['conversation'].tolist()
+
+def get_tokenizer(corpus, lang, vocab_size=52000, s_tokens=False):
+    temp_file = f"./SentencePiece_{lang}.txt"
+    
+    with open(temp_file, "w", encoding='utf-8') as f:
+        for i in tqdm(range(len(corpus))):
+            f.write(corpus[i] + '\n')
+    
+    print("file saved..")
+    
+    prefix = f"SentencePiece_{lang}"
+    
+    spm.SentencePieceTrainer.Train(
+        f"--input={temp_file} --model_prefix={prefix} --vocab_size={vocab_size}" + 
+        " --model_type=bpe" +
+        " --pad_id=0" + # pad (0)
+        " --unk_id=1" + # unknown (1)
+        " --bos_id=2" + # begin of sequence (2)
+        " --eos_id=3"   # end of sequence (3)
+    )
+    print("train has been finish")
+
+    tokenizer = spm.SentencePieceProcessor()
+    tokenizer.load(f"{prefix}.model")
+    print("model loaded..")
+    
+    if s_tokens:
+        tokenizer.set_encode_extra_options("bos:eos")
+    
+    corpus = [tokenizer.EncodeAsIds(sentence) for sentence in corpus]
+    print("tokenizing has been finish")
+    
+    return corpus, tokenizer
+
+sentences, tokenizer = get_tokenizer(conversations, '249388')
+# tokenizer = spm.SentencePieceProcessor()
+# tokenizer.load("SentencePiece_02-04.model")
+
+# src_corpus = [tokenizer.EncodeAsIds(sentence) for sentence in corpus['document']]
+```
+허깅페이스의 토크나이저는 vocabulary가 정해져 있어서 커스텀 데이터에 맞는 커스텀 토크나이저가 있다면 어떨까 시도해봄.
+결과는 `RuntimeError: CUDA error: device-side assert triggered
+CUDA kernel errors might be asynchronously reported at some other API call,so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1.` 오류를 마지막으로 실험 종료.
 ---
 ### 참고 문헌
 1. [songys/AwesomeKorean_Data: 한국어 데이터 세트 링크](https://github.com/songys/AwesomeKorean_Data)
