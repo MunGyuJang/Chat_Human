@@ -410,7 +410,185 @@ For debugging consider passing CUDA_LAUNCH_BLOCKING=1.
 
 오류를 마지막으로 실험 종료.
 
----
+- index.html
+```html
+<!------
+This code is an adaptation of the original work of pablocorezzola 
+provided at https://bootsnipp.com/snippets/y8e4W
+under the MIT license
+
+Avatar icons were obtained from:
+
+bot:
+https://www.flaticon.com/free-icon/bot_1786548?term=bot%20avatar&page=1&position=1&page=1&position=1&related_id=1786548&origin=search
+
+human:
+https://www.flaticon.com/premium-icon/man_2202112?term=avatar&page=1&position=2&page=1&position=2&related_id=2202112&origin=search
+                
+---------->
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+        <link href="https://use.fontawesome.com/releases/v5.0.7/css/all.css" rel="stylesheet">
+        <link href="https://stackpath.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" href="{{ url_for('static', path='/styles.css') }}">
+		<style>
+			.cont_a{
+                position:relative;
+                display:flex;
+            }
+			.col-sm-4.col-sm-offset-4.frame{
+				min-width:450px;
+                min-height:720px;
+			}
+            .using_manual{
+				background-color:#f0f0f0;
+				border-top:20px solid #9999ff;
+				border-bottom:20px solid #9999ff;
+				border-left:2px solid #9999ff;
+				border-right:2px solid #9999ff;
+				border-radius:10px;
+				position:relative;
+                padding:15px;
+				margin:20px;
+				height:auto;
+				box-shadow: 5px 5px 10px;
+            }
+            body{
+                font-size:small;
+            }
+            
+            
+		</style>
+    </head>
+    <body>
+        <div class="cont_a">
+            <div class="col-sm-4 col-sm-offset-4 frame">
+                <ul>
+                    {{ chat|safe }}
+                </ul>
+                <div>
+                    <form class="col-sm-12" name="frm1" method="post" action="/">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="message" placeholder="Type a message">
+                            <span class="btn input-group-addon glyphicon glyphicon-share-alt" onclick="frm1.submit()"></span>
+                        </div>
+                    </form>            
+                </div>
+            </div>
+			
+			<div class="using_manual">
+                <center><h4>챗휴먼팀의 챗봇 이랑을 찾아주셔서 감사합니다.</h4></center>
+                <p>저희에게는 이런 기능들이 있습니다.</p>
+                <p><span><b><u>로또, 날씨, 시간, 영어오탈자 구분, 주식 검색</u></b></span></p>
+                <p><span><b>1. 시간을 알려드립니다.</b></span></p>
+                <p><span><i>→ 사용법 : 이랑아 지금 몇시야?</i></span></p>
+                <p><span><i>          이랑아 시간 알려줘.</i></span></p>
+                <p><span><b>2. 날씨를 알려드립니다.</b></span></p>
+                <p><span><i>→ 사용법 : 고잔동 날씨 어때?</i></span></p>
+                <p><span><i>(고잔동이라 할때 안산 단원구의 고잔동을 우선으로 검색함.)</i></span></p>
+                <p><span><i>	인천 고잔동 날씨 어때?</i></span></p>
+                <p><span><i>(시를 구분해줌으로 인천 고잔동의 날씨를 검색 가능.)</i></span></p>
+                <p><span><b>3. 로또번호를 뽑아드립니다.</b></span></p>
+                <p><span><i>→ 사용법 : 이랑아 로또번호 뽑아줘.</i></span></p>
+                <p><span><i>          이랑아 로또번호 추천해줘.</i></span></p>
+                <p><span><b>4. 실시간 주식 가격을 알려드립니다.</b></span></p>
+                <p><span><b>→ 사용법 : 삼성전자 주가 알려줘.</b></span></p>
+                <p><span><i>          삼성전자 주식 얼마야?</i></span></p>
+                <p><span><i>          삼성전자 주가 얼마야?</i></span></p>
+                <p><span><b>5. 한글이 안쳐져도 괜찮습니다.</b></span></p>
+                <p><span><i>→ 사용법 : dk rkqwkrl gksrmfdl dkscuwu('아 갑자기 한글이 안쳐져')</i></span></p>
+                <p><span><i>          dkssud('안녕')</i></span></p>
+				<div align="right" style="font-size:8px;">AIFFEL 인천캠퍼스 3기 챗휴먼팀</div>
+            </div>
+        </div>
+        <script>
+            window.onload = function() {
+            var a = document.querySelector("ul");
+            a.scrollTop = a.scrollHeight;
+			document.frm1.message.focus();
+            }
+        </script>
+    </body>
+    <footer>
+        <a class="footer" href="https://www.flaticon.com/free-icons" title="icons">
+            Icons created by Freepik - Flaticon
+        </a>
+    </footer>
+<html>
+```
+단순히 설명 문구를 ui로 표현하고, 몇 가지 이슈를 수정하는 많지 않은 작업이 필요했지만  
+HTML을 배워본 적이 없어서 상당히 많은 시간이 소요됐다.
+
+특히 채팅을 치면 스크롤이 맨 위로 올라가는 문제, 매 채팅마다 텍스트 박스의 포커싱이 풀리는 문제를 해결하기 위해  
+옳은 방법은 아니지만 어거지로 자바스크립트 함수를 덮어씌워 좋지 못한 코드가 됨.
+
+- FastAPI
+```python
+import uvicorn
+from typing import Optional
+from fastapi import FastAPI, Request, Form
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from html_utils import build_html_chat
+from model import ChatBot
+
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+import time
+
+app = FastAPI()
+
+# initialises the chatbot model and starts the uvicorn app
+chatbot = ChatBot()
+
+# mounts the static folder that contains the css file
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# locates the template files that will be modified at run time
+# with the dialog form the user and bot
+templates = Jinja2Templates(directory="templates")
+
+@app.post("/", response_class=HTMLResponse)
+@app.get("/", response_class=HTMLResponse)
+async def root(request:Request, message: Optional[str] = Form(None)):
+  # if the Form is not None, then get a reply from the bot
+  if message is not None:
+  
+    # gets a response of the AI bot
+    _ = chatbot.get_reply(message)
+
+    # converts the chat history into an HTML dialog
+    chat_html = '\n'.join([
+      build_html_chat(is_me=i%2==0, text=msg['text'], time=msg['time'])
+      for i, msg in enumerate(chatbot.chat_history)
+    ])
+  
+  else: # 최초 연결 시 index.html 갱신을 위한 더미 신호이지만 아무것도 입력하지 않은 채팅을 보낼 시 채팅 로그가 사라져보이는 문제 발생
+    chat_html = ''
+    
+  message_dict = {
+    "request": request,
+    "chat": chat_html
+  }
+  
+  # returns the final HTML
+  return templates.TemplateResponse("index.html", message_dict)
+
+
+# initialises the chatbot model and starts the uvicorn app
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+```
+여러가지 이슈 중 가장 해결하고 싶었던 문제로 유저 대화가 먼저 올라가고 시스템 대화가 생성되면 순차적으로 올라가지 않고  
+유저 대화를 받으면 시스템 대화까지 생성한 뒤에 한 번에 두 개의 문장이 업데이트 되는 이슈가 있었는데,
+
+정말 많은 시도를 해봤지만 결국 해결하지 못함.
+
 ### 참고 문헌
 1. [songys/AwesomeKorean_Data: 한국어 데이터 세트 링크](https://github.com/songys/AwesomeKorean_Data)
 2. [자유대화형식의 음성 데이터](https://www.aihub.or.kr/aihubdata/data/view.do?currMenu=115&topMenu=100&dataSetSn=109)
