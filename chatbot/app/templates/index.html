@@ -1,0 +1,106 @@
+<!------
+This code is an adaptation of the original work of pablocorezzola 
+provided at https://bootsnipp.com/snippets/y8e4W
+under the MIT license
+
+Avatar icons were obtained from:
+
+bot:
+https://www.flaticon.com/free-icon/bot_1786548?term=bot%20avatar&page=1&position=1&page=1&position=1&related_id=1786548&origin=search
+
+human:
+https://www.flaticon.com/premium-icon/man_2202112?term=avatar&page=1&position=2&page=1&position=2&related_id=2202112&origin=search
+                
+---------->
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+        <link href="https://use.fontawesome.com/releases/v5.0.7/css/all.css" rel="stylesheet">
+        <link href="https://stackpath.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" href="{{ url_for('static', path='/styles.css') }}">
+		<style>
+			.cont_a{
+                position:relative;
+                display:flex;
+            }
+			.col-sm-4.col-sm-offset-4.frame{
+				min-width:450px;
+                min-height:720px;
+			}
+            .using_manual{
+				background-color:#f0f0f0;
+				border-top:20px solid #9999ff;
+				border-bottom:20px solid #9999ff;
+				border-left:2px solid #9999ff;
+				border-right:2px solid #9999ff;
+				border-radius:10px;
+				position:relative;
+                padding:15px;
+				margin:20px;
+				height:auto;
+				box-shadow: 5px 5px 10px;
+            }
+            body{
+                font-size:small;
+            }
+            
+            
+		</style>
+    </head>
+    <body>
+        <div class="cont_a">
+            <div class="col-sm-4 col-sm-offset-4 frame">
+                <ul>
+                    {{ chat|safe }}
+                </ul>
+                <div>
+                    <form class="col-sm-12" name="frm1" method="post" action="/">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="message" placeholder="Type a message">
+                            <span class="btn input-group-addon glyphicon glyphicon-share-alt" onclick="frm1.submit()"></span>
+                        </div>
+                    </form>            
+                </div>
+            </div>
+			
+			<div class="using_manual">
+                <center><h4>챗휴먼팀의 챗봇 이랑을 찾아주셔서 감사합니다.</h4></center>
+                <p>저희에게는 이런 기능들이 있습니다.</p>
+                <p><span><b><u>로또, 날씨, 시간, 영어오탈자 구분, 주식 검색</u></b></span></p>
+                <p><span><b>1. 시간을 알려드립니다.</b></span></p>
+                <p><span><i>→ 사용법 : 이랑아 지금 몇시야?</i></span></p>
+                <p><span><i>          이랑아 시간 알려줘.</i></span></p>
+                <p><span><b>2. 날씨를 알려드립니다.</b></span></p>
+                <p><span><i>→ 사용법 : 고잔동 날씨 어때?</i></span></p>
+                <p><span><i>(고잔동이라 할때 안산 단원구의 고잔동을 우선으로 검색함.)</i></span></p>
+                <p><span><i>	인천 고잔동 날씨 어때?</i></span></p>
+                <p><span><i>(시를 구분해줌으로 인천 고잔동의 날씨를 검색 가능.)</i></span></p>
+                <p><span><b>3. 로또번호를 뽑아드립니다.</b></span></p>
+                <p><span><i>→ 사용법 : 이랑아 로또번호 뽑아줘.</i></span></p>
+                <p><span><i>          이랑아 로또번호 추천해줘.</i></span></p>
+                <p><span><b>4. 실시간 주식 가격을 알려드립니다.</b></span></p>
+                <p><span><b>→ 사용법 : 삼성전자 주가 알려줘.</b></span></p>
+                <p><span><i>          삼성전자 주식 얼마야?</i></span></p>
+                <p><span><i>          삼성전자 주가 얼마야?</i></span></p>
+                <p><span><b>5. 한글이 안쳐져도 괜찮습니다.</b></span></p>
+                <p><span><i>→ 사용법 : dk rkqwkrl gksrmfdl dkscuwu('아 갑자기 한글이 안쳐져')</i></span></p>
+                <p><span><i>          dkssud('안녕')</i></span></p>
+				<div align="right" style="font-size:8px;">AIFFEL 인천캠퍼스 3기 챗휴먼팀</div>
+            </div>
+        </div>
+        <script>
+            window.onload = function() {
+            var a = document.querySelector("ul");
+            a.scrollTop = a.scrollHeight;
+            }
+        </script>
+    </body>
+    <footer>
+        <a class="footer" href="https://www.flaticon.com/free-icons" title="icons">
+            Icons created by Freepik - Flaticon
+        </a>
+    </footer>
+<html>
