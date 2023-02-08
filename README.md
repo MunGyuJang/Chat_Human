@@ -410,7 +410,7 @@ For debugging consider passing CUDA_LAUNCH_BLOCKING=1.
 
 오류를 마지막으로 실험 종료.
 
-- index.html
+- HTML
 ```html
 <!------
 This code is an adaptation of the original work of pablocorezzola 
@@ -524,7 +524,7 @@ https://www.flaticon.com/premium-icon/man_2202112?term=avatar&page=1&position=2&
 HTML을 배워본 적이 없어서 상당히 많은 시간이 소요됐다.
 
 특히 채팅을 치면 스크롤이 맨 위로 올라가는 문제, 매 채팅마다 텍스트 박스의 포커싱이 풀리는 문제를 해결하기 위해  
-옳은 방법은 아니지만 어거지로 자바스크립트 함수를 덮어씌워 좋지 못한 코드가 됨.
+옳은 방법은 아니지만 코드를 수정하기보다 함수를 덮어씌워 좋지 못한 코드가 됨.
 
 - FastAPI
 ```python
